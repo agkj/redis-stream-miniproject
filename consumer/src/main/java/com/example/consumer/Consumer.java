@@ -33,6 +33,7 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
 
     }
 
+    //returns json object of exisiting streams
     public List<MapRecord<String ,Object,Object>> retrieveStreams(){
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
