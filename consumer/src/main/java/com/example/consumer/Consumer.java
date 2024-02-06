@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class Consumer implements StreamListener<String, ObjectRecord<String,String>> {
 
     @Autowired
-    @Lazy
+    @Lazy // DONT WANT TO USE THIS, MAY NEED TO FIX
     private RedisTemplate<String, Object> redisTemplate;
 
     //send and publish to stream, listening
