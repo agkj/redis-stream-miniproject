@@ -44,6 +44,7 @@ public class Producer {
 
         ObjectRecord<String ,String > record = StreamRecords.newRecord().ofObject(message).withStreamKey(String.valueOf(SharedKeysEnum.STREAM_KEY));
         this.redisTemplate.opsForStream().add(record);
+        
         atomicInteger.incrementAndGet();
     }
 

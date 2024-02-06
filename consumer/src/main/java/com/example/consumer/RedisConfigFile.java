@@ -12,6 +12,7 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamListener;
@@ -44,9 +45,14 @@ public class RedisConfigFile {
     public RedisTemplate<String, Object> template(){
         RedisTemplate<String, Object> template = new RedisTemplate<String,Object>();
         template.setConnectionFactory(lettuceConnectionFactory());
+
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+        // template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+        template.setValueSerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
+
+
         template.afterPropertiesSet();
         return template;
     }

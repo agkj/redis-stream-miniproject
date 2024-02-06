@@ -37,6 +37,7 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
     public List<MapRecord<String ,Object,Object>> retrieveStreams(){
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
+
         return streamOperations.range(String.valueOf(SharedKeysEnum.STREAM_KEY), Range.closed("0","+"));
     }
 
