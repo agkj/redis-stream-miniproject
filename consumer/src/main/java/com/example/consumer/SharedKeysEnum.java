@@ -1,7 +1,9 @@
 package com.example.consumer;
 
 public enum SharedKeysEnum {
-    STREAM_KEY,
-    GROUP_KEY;
+    USER_STREAM_KEY,
+    USER_GROUP_KEY,
+    GATE_STREAM_KEY,
+    GATE_GROUP_KEY;
 
 }
