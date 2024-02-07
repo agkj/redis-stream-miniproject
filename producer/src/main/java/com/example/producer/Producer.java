@@ -23,42 +23,55 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Producer {
 
 
-    @Value("${stream.key:STREAM_KEY}")
-    private String streamKey;
-
-
     private final RedisTemplate<String, Object> redisTemplate;
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
 
-    public void streamPublisher(String message){
+    public void userPublisher(String message){
         //create consumer group
         try {                                             //key, group
-            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.STREAM_KEY), String.valueOf(SharedKeysEnum.GROUP_KEY));
+            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), String.valueOf(SharedKeysEnum.USER_GROUP_KEY));
         }catch (RedisSystemException e){
 
 
             if(e.getCause() != null){
-                log.info("group exists already! skipping group creation with id: " + SharedKeysEnum.STREAM_KEY);
+                log.info("group exists already! skipping group creation with id: " + SharedKeysEnum.USER_STREAM_KEY);
             }else throw e;
         }
 
-        ObjectRecord<String ,String > record = StreamRecords.newRecord().ofObject(message).withStreamKey(String.valueOf(SharedKeysEnum.STREAM_KEY));
+        ObjectRecord<String ,String > record = StreamRecords.newRecord().ofObject(message).withStreamKey(String.valueOf(SharedKeysEnum.USER_STREAM_KEY));
         this.redisTemplate.opsForStream().add(record);
+
         
         atomicInteger.incrementAndGet();
     }
 
+    //TO TEST THIS SHIT
+    public void gatePublisher(GateObject gateObject){
+        //create consumer group
+        try {                                             //key, group
+            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), String.valueOf(SharedKeysEnum.GATE_GROUP_KEY));
+        }catch (RedisSystemException e){
 
 
-    public void autoDeleteUsers(){
+            if(e.getCause() != null){
+                log.info("group exists already! skipping group creation with id:");
+            }else throw e;
+        }
 
+        ObjectRecord<String ,GateObject > record = StreamRecords.newRecord().ofObject(gateObject).withStreamKey(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+        this.redisTemplate.opsForStream().add(record);
+
+        atomicInteger.incrementAndGet();
+    }
+
+    public void autoDeleteGates(){
         //stream id represents the time it has entered the stream
         // if can use current time to minus the stream entry timestamp, can find out the time the stream has existed.
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
         //get stream size
-        Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.STREAM_KEY));
+        Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
         Long currentTime = System.currentTimeMillis();
 
         // Delete the stream entries using XTRIM, must have at least 1 entries before delete can be executed
@@ -73,14 +86,57 @@ public class Producer {
             //retrieve records
             for (int i =0;i<streamsize;i++){
 
-                String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
-                Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
-                RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.STREAM_KEY), Range.closed(bot,top)).get(i).getId();
+                String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
+                Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
+                RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
 
                 //delete entries that have lasted for more than 20 sec
                 if(currentTime - streamEntryTime >20000 ){
                     //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
-                    streamOperations.delete(String.valueOf(SharedKeysEnum.STREAM_KEY),recordId);
+                    streamOperations.delete(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY),recordId);
+
+                    System.out.println("Message: " + streamMessage + " has been deleted");
+                    break;
+                }
+
+            }
+
+            //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
+
+        }
+    }
+
+    public void autoDeleteUsers(){
+
+        //stream id represents the time it has entered the stream
+        // if can use current time to minus the stream entry timestamp, can find out the time the stream has existed.
+
+        StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
+
+        //get stream size
+        Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.USER_STREAM_KEY));
+        Long currentTime = System.currentTimeMillis();
+
+        // Delete the stream entries using XTRIM, must have at least 1 entries before delete can be executed
+        if(streamsize <=5){
+            System.out.println("No entries to delete as at " + System.currentTimeMillis());
+        }
+        else {
+
+            String bot = "0";
+            String top = "+";
+
+            //retrieve records
+            for (int i =0;i<streamsize;i++){
+
+                String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
+                Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
+                RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
+
+                //delete entries that have lasted for more than 20 sec
+                if(currentTime - streamEntryTime >20000 ){
+                    //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
+                    streamOperations.delete(String.valueOf(SharedKeysEnum.USER_STREAM_KEY),recordId);
                     System.out.println("Message: " + streamMessage + " has been deleted");
                     break;
                 }

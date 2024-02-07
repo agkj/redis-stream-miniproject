@@ -16,18 +16,27 @@ public class ProducerController {
     private final Producer producer;
 
 
-    @PostMapping(value = "/publishers" )
+    @PostMapping(value = "/publish" )
     public String streamPublisher(@RequestBody String message){
-        producer.streamPublisher(message);
+        producer.userPublisher(message);
         return "message published";
     }
 
+    //TO TEST THIS SHIT
+    @PostMapping(value = "/gatepub" )
+    public String streamPublisher(@RequestBody GateObject gateObject){
+        producer.gatePublisher(gateObject);
+        return "gate-pub";
+    }
+
+
+
     //executes every second
     //checks the stream for streams that existed for more than 20 sec
-    @Scheduled(fixedDelay = 1000)
-    public String deleteUsers(){
-        producer.autoDeleteUsers();
-        return "auto deleting users";
+    @Scheduled(fixedDelay = 10000)
+    public String deleteGates(){
+        producer.autoDeleteGates();
+        return "deleting gate data";
     }
 
 

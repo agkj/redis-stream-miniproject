@@ -15,10 +15,17 @@ import java.util.List;
 public class ConsumerController {
 
     private final Consumer consumer;
-    @GetMapping(path = "/streamlist")
+    @GetMapping(path = "/retrieve-users")
     public List<MapRecord<String ,Object,Object>> retrieveUsers(){
-        return consumer.retrieveStreams();
+        return consumer.retrieveUsers();
         //return "list of users";
     }
+    //TO EDIT THIS SHIT
+    @GetMapping(path = "/retrieve-gates")
+    public List<MapRecord<String ,Object,Object>> retrieveGates(){
+        return consumer.retrieveGates();
+        //return "list of users";
+    }
+
 
 }
