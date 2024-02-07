@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Consumer home page</title>
+</head>
+<body>
+<h1>Gate Data</h1>
+<table style="width:20%">
+    <tr>
+        <td>Gate Number</td>
+        <td>Gate Status</td>
+        <td>Hold data</td>
+    </tr>
+    <!-- Loop through the gateData and display each gateNumber and status -->
+    <tr th:each="gateInfo : ${gateData}">
+        <div class="gate-number">
+            <td th:text="${gateInfo['gateNumber']}"></td>
+
+        </div>
+        <div class="gate-status">
+            <td th:text="${gateInfo['gateStatus']}"></td>
+        </div>
+        <form method="post">
+            <div class ="gate-hold">
+                <label>
+                    <td><input type="checkbox" th:checked = "${gateHold}" ></td>
+                </label>
+            </div>
+        </form>
+
+
+
+    </tr>
+</table>
+</body>
+</html>
