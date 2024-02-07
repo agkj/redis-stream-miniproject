@@ -1,18 +1,17 @@
-package com.example.producer.DAO;
+package com.example.producer.Model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.redis.core.RedisHash;
 
 @NoArgsConstructor
 @Slf4j
 @Data
 
-public class GateObject {
+public class GateModel {
 
     private int gateNumber;
-    private boolean status;
+    private boolean gateStatus;
+    private boolean gateHold;
 
 }
