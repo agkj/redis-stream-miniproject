@@ -1,5 +1,6 @@
-package com.example.consumer;
+package com.example.consumer.Config;
 
+import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
