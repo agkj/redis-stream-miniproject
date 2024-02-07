@@ -1,20 +1,15 @@
 package com.example.producer;
 
-import io.lettuce.core.RedisException;
+import com.example.producer.Model.GateModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.stream.*;
-import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
-import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
@@ -46,7 +41,7 @@ public class Producer {
     }
 
     //TO TEST THIS SHIT
-    public void gatePublisher(GateObject gateObject){
+    public void gatePublisher(GateModel gateModel){
         //create consumer group
         try {                                             //key, group
             this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), String.valueOf(SharedKeysEnum.GATE_GROUP_KEY));
@@ -58,7 +53,7 @@ public class Producer {
             }else throw e;
         }
 
-        ObjectRecord<String ,GateObject > record = StreamRecords.newRecord().ofObject(gateObject).withStreamKey(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+        ObjectRecord<String , GateModel> record = StreamRecords.newRecord().ofObject(gateModel).withStreamKey(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
         this.redisTemplate.opsForStream().add(record);
 
         atomicInteger.incrementAndGet();

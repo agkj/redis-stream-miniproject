@@ -1,4 +1,4 @@
-package com.example.producer;
+package com.example.producer.DAO;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,11 +9,10 @@ import org.springframework.data.redis.core.RedisHash;
 @NoArgsConstructor
 @Slf4j
 @Data
-@TypeAlias("Gate Object") // used to identify the object
 
 public class GateObject {
 
-    private String gateName;
+    private int gateNumber;
     private boolean status;
 
 }
