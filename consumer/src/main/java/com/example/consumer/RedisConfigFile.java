@@ -48,10 +48,13 @@ public class RedisConfigFile {
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        // template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+
+        //template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
         template.setValueSerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new StringRedisSerializer());
 
+        // template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        // template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         template.afterPropertiesSet();
         return template;
@@ -79,8 +82,8 @@ public class RedisConfigFile {
 
         //consume message
         var subscription = listenerContainer.
-                receiveAutoAck(Consumer.from(String.valueOf(SharedKeysEnum.GROUP_KEY),InetAddress.getLocalHost().getHostName()),
-                StreamOffset.create(String.valueOf(SharedKeysEnum.STREAM_KEY), ReadOffset.lastConsumed()),
+                receiveAutoAck(Consumer.from(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY),InetAddress.getLocalHost().getHostName()),
+                StreamOffset.create(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
                 streamListener);
         listenerContainer.start();
         return subscription;
