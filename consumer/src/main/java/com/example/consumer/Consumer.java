@@ -34,12 +34,20 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
     }
 
     //returns json object of exisiting streams
-    public List<MapRecord<String ,Object,Object>> retrieveStreams(){
+    public List<MapRecord<String ,Object,Object>> retrieveUsers(){
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
-        return streamOperations.range(String.valueOf(SharedKeysEnum.STREAM_KEY), Range.closed("0","+"));
+        return streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed("0","+"));
     }
+
+    public List<MapRecord<String ,Object,Object>> retrieveGates(){
+
+        StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
+
+        return streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed("0","+"));
+    }
+
 
 
 
