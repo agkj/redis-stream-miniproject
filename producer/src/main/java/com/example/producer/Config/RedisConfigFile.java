@@ -1,4 +1,4 @@
-package com.example.producer;
+package com.example.producer.Config;
 
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;

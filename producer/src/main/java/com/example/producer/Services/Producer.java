@@ -1,6 +1,7 @@
-package com.example.producer;
+package com.example.producer.Services;
 
 import com.example.producer.Model.GateModel;
+import com.example.producer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Range;

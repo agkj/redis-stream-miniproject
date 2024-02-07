@@ -1,9 +1,9 @@
-package com.example.producer;
+package com.example.producer.Controllers;
 
+import com.example.producer.Model.GateModel;
+import com.example.producer.Services.Producer;
 import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ public class ProducerController {
     private final Producer producer;
 
 
-    @PostMapping(value = "/publish" )
+    @PostMapping(value = "/userpub" )
     public String streamPublisher(@RequestBody String message){
         producer.userPublisher(message);
         return "message published";
@@ -24,8 +24,8 @@ public class ProducerController {
 
     //TO TEST THIS SHIT
     @PostMapping(value = "/gatepub" )
-    public String streamPublisher(@RequestBody GateObject gateObject){
-        producer.gatePublisher(gateObject);
+    public String streamPublisher(@RequestBody GateModel gateModel){
+        producer.gatePublisher(gateModel);
         return "gate-pub";
     }
 
