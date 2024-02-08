@@ -1,6 +1,5 @@
-package com.example.consumer.Config;
+package com.example.consumer;
 
-import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,14 +11,10 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.Subscription;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,7 +24,7 @@ import java.time.Duration;
 @Configuration
 @RequiredArgsConstructor
 
-public class RedisConfigFile {
+public class ConsumerConfig {
 
     //enables connectivity, configuration properties
     @Bean
@@ -83,7 +78,7 @@ public class RedisConfigFile {
 
         //consume message
         var subscription = listenerContainer.
-                receiveAutoAck(Consumer.from(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY),InetAddress.getLocalHost().getHostName()),
+                receiveAutoAck(Consumer.from(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A),InetAddress.getLocalHost().getHostName()),
                 StreamOffset.create(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
                 streamListener);
         listenerContainer.start();
