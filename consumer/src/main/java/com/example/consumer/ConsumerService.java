@@ -1,6 +1,5 @@
-package com.example.consumer.Services;
+package com.example.consumer;
 
-import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
-import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.stream.StreamListener;
@@ -22,12 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor //reduce boilerplate code, no need to declare constructors/methods for implementation
 @Slf4j
-public class Consumer implements StreamListener<String, ObjectRecord<String,String>> {
+public class ConsumerService implements StreamListener<String, ObjectRecord<String,String>> {
 
     @Autowired
     @Lazy // DONT WANT TO USE THIS, MAY NEED TO FIX
@@ -40,7 +37,7 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
 
     }
 
-    //returns json object of existing streams
+    //returns singular message, not to be used API
     public List<MapRecord<String ,Object,Object>> retrieveUsers(){
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
@@ -48,7 +45,7 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
         return streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed("0","+"));
     }
 
-    //returns json object of existing gates
+    //returns json object of existing gates API
     public List<MapRecord<String ,Object,Object>> retrieveGates(){
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
@@ -65,16 +62,31 @@ public class Consumer implements StreamListener<String, ObjectRecord<String,Stri
         String jsonData = restTemplate.getForObject(url, String.class);
 
         // Parse JSON and extract gateNumber and status
-        List<Map<String, String>> gateData = new ArrayList<>();
+        List<Map<String, Object>> gateData = new ArrayList<>();
         JSONArray jsonArray = new JSONArray(jsonData);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             JSONObject value = jsonObject.getJSONObject("value");
             String gateNumber = value.getString("gateNumber");
+
             String gateStatus = value.getString("gateStatus");
-            Map<String, String> gateInfo = new HashMap<>();
-            gateInfo.put("gateNumber", gateNumber);
+
+            String gateHold = value.getString("gateHold");
+
+            String gateGroup = value.getString("gateGroup");
+
+            //TODO: Fix serializer if possible to reduce code below
+            //QUICK FIX TO CONVERT STRING TO OBJECT TYPE BECAUSE JSON SERIALIZER NOT WORKING
+            int gateNum = Integer.valueOf(gateNumber);
+           // boolean gateStat = Boolean.valueOf(gateStatus);
+            boolean gateHol = Boolean.valueOf(gateHold);
+
+
+            Map<String, Object> gateInfo = new HashMap<>();
+            gateInfo.put("gateNumber", gateNum);
             gateInfo.put("gateStatus", gateStatus);
+            gateInfo.put("gateHold", gateHol);
+            gateInfo.put("gateGroup", gateGroup);
             gateData.add(gateInfo);
         }
 
