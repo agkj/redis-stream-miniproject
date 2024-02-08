@@ -45,7 +45,7 @@ public class Producer {
     public void gatePublisher(GateModel gateModel){
         //create consumer group
         try {                                             //key, group
-            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), String.valueOf(SharedKeysEnum.GATE_GROUP_KEY));
+            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A));
         }catch (RedisSystemException e){
 
 
@@ -78,7 +78,7 @@ public class Producer {
 
             String bot = "0";
             String top = "+";
-
+            //TODO: Clean up below code
             //retrieve records
             for (int i =0;i<streamsize;i++){
 
@@ -101,7 +101,7 @@ public class Producer {
 
         }
     }
-
+    //SINGLE INPUT MESSAGE
     public void autoDeleteUsers(){
 
         //stream id represents the time it has entered the stream
