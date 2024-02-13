@@ -1,5 +1,6 @@
 package com.example.consumer;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor //reduce boilerplate code, no need to declare constructors/methods for implementation
@@ -54,48 +52,59 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
     }
 
 
+
     //converts json object from retrieve gates and convert it to model view
     public Model displayGates(Model model){
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8081/consumer/retrieve-gates";
 
+        String url = "http://localhost:8081/consumer/retrieve-gates";
         String jsonData = restTemplate.getForObject(url, String.class);
 
         // Parse JSON and extract gateNumber and status
         List<Map<String, Object>> gateData = new ArrayList<>();
+
         JSONArray jsonArray = new JSONArray(jsonData);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
+
             JSONObject value = jsonObject.getJSONObject("value");
             String gateNumber = value.getString("gateNumber");
-
             String gateStatus = value.getString("gateStatus");
-
-            String gateHold = value.getString("gateHold");
-
             String gateGroup = value.getString("gateGroup");
 
             //TODO: Fix serializer if possible to reduce code below
             //QUICK FIX TO CONVERT STRING TO OBJECT TYPE BECAUSE JSON SERIALIZER NOT WORKING
-            int gateNum = Integer.valueOf(gateNumber);
-           // boolean gateStat = Boolean.valueOf(gateStatus);
-            boolean gateHol = Boolean.valueOf(gateHold);
 
+            boolean gateStat = "1".equals(gateStatus);
+           // boolean gateHoldBool = "1".equals(gateHold);
 
             Map<String, Object> gateInfo = new HashMap<>();
-            gateInfo.put("gateNumber", gateNum);
-            gateInfo.put("gateStatus", gateStatus);
-            gateInfo.put("gateHold", gateHol);
+            gateInfo.put("gateNumber", gateNumber);
+            gateInfo.put("gateStatus", gateStat);
+           // gateInfo.put("gateHold", gateHoldBool);
             gateInfo.put("gateGroup", gateGroup);
             gateData.add(gateInfo);
+
+
+
+
+
+
         }
 
         // Pass the data to the HTML template
-         return model.addAttribute("gateData", gateData);
+
+
+        return model.addAttribute("gateData", gateData);
 
 
     }
 
+    //convert epoch time to timestamp 13/2/24
+    public String ConvertEpochTime(){
+
+        return "1";
+    }
 
 
 
