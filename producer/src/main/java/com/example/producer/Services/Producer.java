@@ -44,7 +44,7 @@ public class Producer {
         atomicInteger.incrementAndGet();
     }
 
-    //TO TEST THIS SHIT
+    //Adds a new stream entry to the stream
     public void gatePublisher(GateModel gateModel){
         //create consumer group
         try {                                             //key, group
@@ -58,6 +58,7 @@ public class Producer {
         }
 
         ObjectRecord<String , GateModel> record = StreamRecords.newRecord().ofObject(gateModel).withStreamKey(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+
         this.redisTemplate.opsForStream().add(record);
 
         atomicInteger.incrementAndGet();
@@ -94,19 +95,17 @@ public class Producer {
                 RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
 
                 //if gate hold checkbox is checked, prevent deletion
-                String  gateHold = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getValue().get("gateHold").toString();
-
 
                //TODO: SERIALIZER HAS ISSUES, THIS IS A SIMPLE FIX REFER TO ConsumerService Class for implementation
 
-                boolean gateHoldBool = "1".equals(gateHold);
+
 
 
 
                 //need to get model attribute
 
                 //delete entries
-                if(currentTime - streamEntryTime >20000 && gateHoldBool == false ){
+                if(currentTime - streamEntryTime >20000){
                     //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
                     streamOperations.delete(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY),recordId);
 
