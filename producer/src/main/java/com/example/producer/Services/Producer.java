@@ -4,12 +4,15 @@ import com.example.producer.Model.GateModel;
 import com.example.producer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,18 +63,21 @@ public class Producer {
         atomicInteger.incrementAndGet();
     }
 
+
     public void autoDeleteGates(){
         //stream id represents the time it has entered the stream
         // if can use current time to minus the stream entry timestamp, can find out the time the stream has existed.
+
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
         //get stream size
         Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+        //get current time
         Long currentTime = System.currentTimeMillis();
 
-        // Delete the stream entries using XTRIM, must have at least 1 entries before delete can be executed
-        if(streamsize <=5){
+        // Delete the stream entries using XTRIM, must have at least 5 entries before delete can be executed
+        if(streamsize <=5 ){
             System.out.println("No entries to delete as at " + System.currentTimeMillis());
         }
         else {
@@ -82,12 +88,25 @@ public class Producer {
             //retrieve records
             for (int i =0;i<streamsize;i++){
 
+
                 String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
                 Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
                 RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
 
-                //delete entries that have lasted for more than 20 sec
-                if(currentTime - streamEntryTime >20000 ){
+                //if gate hold checkbox is checked, prevent deletion
+                String  gateHold = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getValue().get("gateHold").toString();
+
+
+               //TODO: SERIALIZER HAS ISSUES, THIS IS A SIMPLE FIX REFER TO ConsumerService Class for implementation
+
+                boolean gateHoldBool = "1".equals(gateHold);
+
+
+
+                //need to get model attribute
+
+                //delete entries
+                if(currentTime - streamEntryTime >20000 && gateHoldBool == false ){
                     //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
                     streamOperations.delete(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY),recordId);
 
