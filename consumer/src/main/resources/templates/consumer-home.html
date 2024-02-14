@@ -3,53 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type = "text/css" th:href="@{/css/styles.css}">
     <title>Consumer home page</title>
 </head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // Function to sort the table based on the clicked column
-        function sortTable(columnIndex, ascending) {
-            var tbody = $('#gateTableBody');
-            var rows = tbody.find('tr').get();
-            rows.sort(function(a, b) {
-                var aValue = $(a).find('td').eq(columnIndex).text();
-                var bValue = $(b).find('td').eq(columnIndex).text();
-                return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-            });
-            $.each(rows, function(index, row) {
-                tbody.append(row);
-            });
-        }
 
-        // Event listener for clicking on the th elements in the thead section
-        $('th').click(function() {
-            var columnIndex = $(this).index();
-            var ascending = $(this).data('order') === 'asc';
-            sortTable(columnIndex, ascending);
-            $(this).data('order', ascending ? 'desc' : 'asc');
-            // Reset arrows
-            $('th').find('.arrow').remove();
-            // Add arrow to indicate sorting direction
-            var arrow = ascending ? '&#9650;' : '&#9660;';
-            $(this).append('<span class="arrow">' + arrow + '</span>');
-        });
-    });
-</script>
-<style>
-    .arrow {
-        margin-left: 5px;
-        font-size: 10px;
-    }
-</style>
 <body>
 <h1>Gate stream Data</h1>
+<h2>Accessing as: </h2>
 <table style="width:40%" class="table table-bordered">
     <thead class="thead-dark">
         <tr>
-            <th data-column="group">Gate Group</th>
-            <th data-column="num">Gate Number</th>
-            <th data-column="status">Gate Status</th>
+            <th>Gate Group</th>
+            <th>Gate Number</th>
+            <th>Gate Status</th>
+            <th>Entry time</th>
         </tr>
     </thead>
 
@@ -59,9 +26,13 @@
         <td th:text="${gateInfo.gateGroup}" data-order="desc"></td>
         <td th:text="${gateInfo.gateNumber}"></td>
         <td th:text="${gateInfo.gateStatus}"></td>
+        <td th:text="${gateInfo.gateTimestamp}"></td>
         <!--TODO: IMPLEMENT CHECKBOX TO PREVENT DATA FROM BEING DELETED IF CHECKBOX IS CHECKED-->
     </tr>
     </tbody>
 </table>
 </body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" th:src="@{/js/index.js}"></script>
 </html>
