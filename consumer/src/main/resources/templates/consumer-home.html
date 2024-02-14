@@ -9,12 +9,14 @@
 
 <body>
 <h1>Gate stream Data</h1>
+<h2>Accessing as: </h2>
 <table style="width:40%" class="table table-bordered">
     <thead class="thead-dark">
         <tr>
             <th>Gate Group</th>
             <th>Gate Number</th>
             <th>Gate Status</th>
+            <th>Entry time</th>
         </tr>
     </thead>
 
@@ -24,6 +26,7 @@
         <td th:text="${gateInfo.gateGroup}" data-order="desc"></td>
         <td th:text="${gateInfo.gateNumber}"></td>
         <td th:text="${gateInfo.gateStatus}"></td>
+        <td th:text="${gateInfo.gateTimestamp}"></td>
         <!--TODO: IMPLEMENT CHECKBOX TO PREVENT DATA FROM BEING DELETED IF CHECKBOX IS CHECKED-->
     </tr>
     </tbody>

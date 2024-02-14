@@ -1,6 +1,5 @@
 package com.example.consumer;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -17,6 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -64,6 +67,10 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
         List<Map<String, Object>> gateData = new ArrayList<>();
 
         JSONArray jsonArray = new JSONArray(jsonData);
+
+        //TODO: Based ON ACCESS LEVEL - TYPE OF KEY, GRANT CERTAIN DISPLAY BASED ON KEYS
+        //
+
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -71,6 +78,12 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
             String gateNumber = value.getString("gateNumber");
             String gateStatus = value.getString("gateStatus");
             String gateGroup = value.getString("gateGroup");
+
+            //TODO: get timestamp and convert from epoch to datetime
+            JSONObject id = jsonObject.getJSONObject("id");
+            Long  timestamp  = id.getLong("timestamp");
+            String gateTimestamp =  ConvertEpochTime(timestamp);
+            System.out.println(gateTimestamp);
 
             //TODO: Fix serializer if possible to reduce code below
             //QUICK FIX TO CONVERT STRING TO OBJECT TYPE BECAUSE JSON SERIALIZER NOT WORKING
@@ -81,6 +94,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
             Map<String, Object> gateInfo = new HashMap<>();
             gateInfo.put("gateNumber", gateNumber);
             gateInfo.put("gateStatus", gateStat);
+            gateInfo.put("gateTimestamp",gateTimestamp);
            // gateInfo.put("gateHold", gateHoldBool);
             gateInfo.put("gateGroup", gateGroup);
             gateData.add(gateInfo);
@@ -100,10 +114,24 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
     }
 
-    //convert epoch time to timestamp 13/2/24
-    public String ConvertEpochTime(){
+    //TODO: convert epoch time to timestamp 13/2/24
+    public String ConvertEpochTime(Long timestamp){
 
-        return "1";
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        ZoneId zoneId = ZoneId.systemDefault(); // Use the system default time zone
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = localDateTime.format(formatter);
+
+        return formattedDateTime;
+    }
+
+
+    //TODO: Add access level to different consumers - gate_A can only access gate A, gate_B only gate B
+    public String accessControl(ConsumerModel consumerModel){
+
+
+        return "ok";
     }
 
 
