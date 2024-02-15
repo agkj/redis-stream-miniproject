@@ -1,5 +1,6 @@
-package com.example.consumer;
+package com.example.consumer.Controllers;
 
+import com.example.consumer.Services.ConsumerService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Controller;
@@ -14,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MODELConsumerController {
 
     private final ConsumerService consumerService;
-    @GetMapping(path = "")
+    @GetMapping(path = "/home")
     public String displayGates(Model model){
 
         consumerService.displayGates(model);
 
         return "consumer-home";
     }
+
+
+
 
 
 

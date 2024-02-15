@@ -1,10 +1,16 @@
-package com.example.consumer;
+package com.example.consumer.Controllers;
 
+import com.example.consumer.DTO.ConsumerDTO;
+import com.example.consumer.DTO.LoginDTO;
+import com.example.consumer.Functions.LoginResponse;
+import com.example.consumer.Model.ConsumerModel;
+import com.example.consumer.Repository.ConsumerRepository;
+import com.example.consumer.Services.ConsumerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -16,6 +22,7 @@ import java.util.List;
 public class APIConsumerController {
 
     private final ConsumerService consumerService;
+
 
     //Retrieves singular message
     @GetMapping(path = "/retrieve-users")
@@ -41,7 +48,24 @@ public class APIConsumerController {
         return jsonData;
     }
 
+    @PostMapping(path = "/adduser")
+    public String addUser(@RequestBody ConsumerDTO consumerDTO){
+        Boolean newConsumer = consumerService.addNewConsumer(consumerDTO);
+
+        if(newConsumer){
+            return "user: has been added with accesslevel: "+ consumerDTO.getAccessLevel();
+        }else {
+            return "user exists, create a new username";
+        }
 
 
+    }
+
+    @PostMapping(path = "/login")
+    public ResponseEntity<?> loginConsumer(@RequestBody LoginDTO loginDTO){
+
+        LoginResponse loginResponse = consumerService.loginUser(loginDTO);
+        return ResponseEntity.ok(loginResponse);
+    }
 
 }

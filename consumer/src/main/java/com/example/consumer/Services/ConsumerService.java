@@ -1,5 +1,11 @@
-package com.example.consumer;
+package com.example.consumer.Services;
 
+import com.example.consumer.DTO.ConsumerDTO;
+import com.example.consumer.DTO.LoginDTO;
+import com.example.consumer.Functions.LoginResponse;
+import com.example.consumer.Model.ConsumerModel;
+import com.example.consumer.Repository.ConsumerRepository;
+import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -12,6 +18,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.stream.StreamListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
@@ -98,12 +105,6 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
            // gateInfo.put("gateHold", gateHoldBool);
             gateInfo.put("gateGroup", gateGroup);
             gateData.add(gateInfo);
-
-
-
-
-
-
         }
 
         // Pass the data to the HTML template
@@ -114,7 +115,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
     }
 
-    //TODO: convert epoch time to timestamp 13/2/24
+    //TODO: convert epoch time to  timestamp 13/2/24, move to some other class
     public String ConvertEpochTime(Long timestamp){
 
         Instant instant = Instant.ofEpochMilli(timestamp);
@@ -126,12 +127,69 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
         return formattedDateTime;
     }
 
+    @Autowired
+    private ConsumerRepository consumerRepository;
+
+
+
+
+    private PasswordEncoder passwordEncoder;
+    //TODO: Add function for logging and creation of users
+    public Boolean addNewConsumer(ConsumerDTO consumerDTO){
+
+        String existingUser = consumerRepository.findByUsername(consumerDTO.getUsername()).toString();
+
+        if(existingUser == consumerDTO.getUsername()){
+            //dont create
+            return false;
+        }
+        else {
+            ConsumerModel consumerModel = new ConsumerModel(
+
+                    consumerDTO.getId(),
+                    consumerDTO.getUsername(),
+                    consumerDTO.getPassword(),
+                    consumerDTO.getAccessLevel()
+            );
+            consumerRepository.save(consumerModel);
+        }
+
+
+       return true;
+    }
+
+
+
 
     //TODO: Add access level to different consumers - gate_A can only access gate A, gate_B only gate B
-    public String accessControl(ConsumerModel consumerModel){
+    public LoginResponse loginUser(LoginDTO loginDTO) {
+
+        ConsumerModel consumerModel1 = consumerRepository.findByUsername(loginDTO.getUsername());
+
+        if(consumerModel1 != null){
+            String password = loginDTO.getPassword();
+            String encodedPassword = consumerModel1.getPassword();
+
+            String accessLevel = loginDTO.getAccessLevel();
 
 
-        return "ok";
+            Boolean passwordCompare = password.equals(encodedPassword);
+
+            if(passwordCompare){
+                Optional<ConsumerModel> consumer = consumerRepository.findByUsernameAndPassword(loginDTO.getUsername(), loginDTO.getPassword());
+                if(consumer.isPresent()){
+                    return new LoginResponse("Welcome",true);
+                }else {
+                    return new LoginResponse("Login failed",false);
+                }
+            }else {
+                return new LoginResponse("Invalid details, try again",false);
+            }
+
+        }
+        return new LoginResponse("Invalid details, try again",false);
+
+
     }
 
 

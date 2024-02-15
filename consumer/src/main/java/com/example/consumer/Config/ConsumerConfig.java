@@ -1,6 +1,8 @@
-package com.example.consumer;
+package com.example.consumer.Config;
 
+import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.Subscription;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -86,9 +90,10 @@ public class ConsumerConfig {
 
     }
 
-
-
-
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
 }
 
