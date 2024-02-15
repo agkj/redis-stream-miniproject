@@ -80,7 +80,7 @@
 		<!-- Enable boostrap-->
 
 
-		<!-- Enable mysql database-->
+		<!-- Enable mysql database and security for login -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
@@ -90,7 +90,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<!-- Enable mysql database-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- Enable mysql database and security for login-->
 
 	</dependencies>
 
