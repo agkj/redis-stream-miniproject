@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.Optional;
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(value = false)
@@ -28,5 +30,17 @@ class ConsumerServiceApplicationTests {
 		Assertions.assertThat(savedUser).isNotNull();
 		Assertions.assertThat(savedUser.getId()).isGreaterThan(0);
 	}
+	@Test
+	public void deleteUser(){
+
+		int userId = 8;
+		repo.deleteById(userId);
+		Optional<ConsumerModel> optionalUser = repo.findById(userId);
+		Assertions.assertThat(optionalUser).isNotPresent();
+
+
+
+	}
+
 
 }
