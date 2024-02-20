@@ -137,25 +137,44 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
     //TODO: Add function for logging and creation of users
     public Boolean addNewConsumer(ConsumerDTO consumerDTO){
 
-        String existingUser = consumerRepository.findByUsername(consumerDTO.getUsername()).toString();
+        //TODO: implement a check to see if user exist and to allocate group type
 
-        if(existingUser == consumerDTO.getUsername()){
-            //dont create
-            return false;
-        }
-        else {
+        ConsumerModel consumerModel1 = consumerRepository.findByUsername(consumerDTO.getUsername());
+
+        //Group allocation
+        if(consumerModel1 == null){
+            System.out.println(consumerDTO.getAccessLevel());
+
+            switch (consumerDTO.getAccessLevel()){
+                case "A":
+                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A));
+                    break;
+                case "B":
+                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_B));
+                    break;
+                case "C":
+                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_C));
+                    break;
+                case "MAIN":
+                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_MAIN));
+                default:
+                    break;
+
+            }
+
             ConsumerModel consumerModel = new ConsumerModel(
-
                     consumerDTO.getId(),
                     consumerDTO.getUsername(),
                     consumerDTO.getPassword(),
-                    consumerDTO.getAccessLevel()
+                    consumerDTO.getAccessLevel(),
+                    consumerDTO.getConsumerGroup()
             );
             consumerRepository.save(consumerModel);
+            return true;
         }
 
+        return false;
 
-       return true;
     }
 
 
