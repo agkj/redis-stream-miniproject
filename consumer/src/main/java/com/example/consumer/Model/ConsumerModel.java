@@ -25,6 +25,9 @@ public class ConsumerModel {
     private String password;
     @Column(nullable = false)
     private String accessLevel;
+    @Column()
+    private String consumerGroup;
+
 
 
 }
