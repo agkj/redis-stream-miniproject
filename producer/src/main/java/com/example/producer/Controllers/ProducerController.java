@@ -31,8 +31,8 @@ public class ProducerController {
 
 
 
-    //executes every second
-    //checks the stream for streams that existed for more than 20 sec
+
+    //checks the stream for streams that existed for more than 10 sec
     @Scheduled(fixedDelay = 10000)
     public String deleteGates(){
         producer.autoDeleteGates();

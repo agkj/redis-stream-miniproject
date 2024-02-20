@@ -16,4 +16,5 @@ public class ConsumerDTO {
     private String username;
     private String password;
     private String accessLevel;
+    private String consumerGroup;
 }

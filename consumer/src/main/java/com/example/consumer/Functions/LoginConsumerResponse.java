@@ -7,10 +7,10 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class LoginResponse {
+public class LoginConsumerResponse {
 
-    String message;
-    Boolean status;
+    private String message;
+    private Boolean status;
 
 
 }
