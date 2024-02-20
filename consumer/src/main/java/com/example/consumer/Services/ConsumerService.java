@@ -2,7 +2,7 @@ package com.example.consumer.Services;
 
 import com.example.consumer.DTO.ConsumerDTO;
 import com.example.consumer.DTO.LoginDTO;
-import com.example.consumer.Functions.LoginResponse;
+import com.example.consumer.Functions.LoginConsumerResponse;
 import com.example.consumer.Model.ConsumerModel;
 import com.example.consumer.Repository.ConsumerRepository;
 import com.example.consumer.SharedKeysEnum;
@@ -75,12 +75,11 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
         JSONArray jsonArray = new JSONArray(jsonData);
 
-        //TODO: Based ON ACCESS LEVEL - TYPE OF KEY, GRANT CERTAIN DISPLAY BASED ON KEYS
+        //TODO: Based ON ACCESS LEVEL - TYPE OF KEY, GRANT CERTAIN DISPLAY BASED ON GROUP KEYS
         //
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-
             JSONObject value = jsonObject.getJSONObject("value");
             String gateNumber = value.getString("gateNumber");
             String gateStatus = value.getString("gateStatus");
@@ -115,7 +114,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
     }
 
-    //TODO: convert epoch time to  timestamp 13/2/24, move to some other class
+    //TODO: convert epoch time to  timestamp 13/2/24 and move to some other class
     public String ConvertEpochTime(Long timestamp){
 
         Instant instant = Instant.ofEpochMilli(timestamp);
@@ -130,11 +129,8 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
     @Autowired
     private ConsumerRepository consumerRepository;
 
-
-
-
     private PasswordEncoder passwordEncoder;
-    //TODO: Add function for logging and creation of users
+
     public Boolean addNewConsumer(ConsumerDTO consumerDTO){
 
         //TODO: implement a check to see if user exist and to allocate group type
@@ -178,10 +174,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
     }
 
 
-
-
-    //TODO: Add access level to different consumers - gate_A can only access gate A, gate_B only gate B
-    public LoginResponse loginUser(LoginDTO loginDTO) {
+    public LoginConsumerResponse loginConsumer(LoginDTO loginDTO) {
 
         ConsumerModel consumerModel1 = consumerRepository.findByUsername(loginDTO.getUsername());
 
@@ -197,16 +190,17 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
             if(passwordCompare){
                 Optional<ConsumerModel> consumer = consumerRepository.findByUsernameAndPassword(loginDTO.getUsername(), loginDTO.getPassword());
                 if(consumer.isPresent()){
-                    return new LoginResponse("Welcome",true);
+
+                    return new LoginConsumerResponse("Welcome",true);
                 }else {
-                    return new LoginResponse("Login failed",false);
+                    return new LoginConsumerResponse("Login failed",false);
                 }
             }else {
-                return new LoginResponse("Invalid details, try again",false);
+                return new LoginConsumerResponse("Invalid details, try again",false);
             }
 
         }
-        return new LoginResponse("Invalid details, try again",false);
+        return new LoginConsumerResponse("User does not exist",false);
 
 
     }
