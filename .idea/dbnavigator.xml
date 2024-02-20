@@ -16,8 +16,8 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="45d4ff6f-b59d-48a0-aab9-532f32a21654">
-      <console name="RedisUserConnection" type="STANDARD" schema="" session="Main"><![CDATA[create schema consumer_acl collate utf8mb4_general_ci;]]></console>
+    <connection id="a0ff1707-1941-4ce8-b88f-861bf5986ed3">
+      <console name="RedisConsumerACL" type="STANDARD" schema="" session="Main"><![CDATA[create schema consumer_acl collate utf8mb4_general_ci;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -27,7 +27,7 @@
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="45d4ff6f-b59d-48a0-aab9-532f32a21654" />
+    <connection id="a0ff1707-1941-4ce8-b88f-861bf5986ed3" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -46,9 +46,9 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="45d4ff6f-b59d-48a0-aab9-532f32a21654" active="true" signed="true">
+      <connection id="a0ff1707-1941-4ce8-b88f-861bf5986ed3" active="true" signed="true">
         <database>
-          <name value="RedisUserConnection" />
+          <name value="RedisConsumerACL" />
           <description value="Consumer ACL" />
           <database-type value="MYSQL" />
           <config-type value="BASIC" />
