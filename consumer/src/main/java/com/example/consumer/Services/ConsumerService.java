@@ -2,10 +2,11 @@ package com.example.consumer.Services;
 
 import com.example.consumer.DTO.ConsumerDTO;
 import com.example.consumer.DTO.LoginDTO;
+import com.example.consumer.Enums.GateGroupKeys;
+import com.example.consumer.Enums.GateStreamKeys;
 import com.example.consumer.Functions.LoginConsumerResponse;
 import com.example.consumer.Model.ConsumerModel;
 import com.example.consumer.Repository.ConsumerRepository;
-import com.example.consumer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -50,7 +51,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
-        return streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed("0","+"));
+        return streamOperations.range(String.valueOf(GateStreamKeys.USER_STREAM_KEY), Range.closed("0","+"));
     }
 
     //returns json object of existing gates API
@@ -58,7 +59,7 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
-        return streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed("0","+"));
+        return streamOperations.range(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), Range.closed("0","+"));
     }
 
 
@@ -143,16 +144,16 @@ public class ConsumerService implements StreamListener<String, ObjectRecord<Stri
 
             switch (consumerDTO.getAccessLevel()){
                 case "A":
-                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A));
+                    consumerDTO.setConsumerGroup(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_A));
                     break;
                 case "B":
-                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_B));
+                    consumerDTO.setConsumerGroup(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_B));
                     break;
                 case "C":
-                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_C));
+                    consumerDTO.setConsumerGroup(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_C));
                     break;
                 case "MAIN":
-                    consumerDTO.setConsumerGroup(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_MAIN));
+                    consumerDTO.setConsumerGroup(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_MAIN));
                 default:
                     break;
 
