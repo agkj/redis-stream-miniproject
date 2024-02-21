@@ -1,8 +1,8 @@
 package com.example.consumer.Config;
 
-import com.example.consumer.SharedKeysEnum;
+import com.example.consumer.Enums.GateGroupKeys;
+import com.example.consumer.Enums.GateStreamKeys;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Configuration
@@ -68,9 +70,35 @@ public class ConsumerConfig {
 
 
 
+
     private final StreamListener<String, ObjectRecord<String ,String>> streamListener;
+
+    //TODO: MODIFY SUBSCRIPTION SO CAN HAVE MULTIPLE GATE GROUPS
+//    @Bean
+//    public Subscription subscription() throws UnknownHostException {
+//        var options = StreamMessageListenerContainer.
+//                StreamMessageListenerContainerOptions.
+//                builder().
+//                pollTimeout(Duration.ofSeconds(1)).
+//                targetType(String.class).
+//                build();
+//
+//        var listenerContainer = StreamMessageListenerContainer.create(lettuceConnectionFactory(),options);
+//
+//        //consume message
+//        var subscription = listenerContainer.
+//                receiveAutoAck(Consumer.from(String.valueOf(GateStreamKeys.GATE_GROUP_KEY_A),InetAddress.getLocalHost().getHostName()),
+//                StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
+//                streamListener);
+//        listenerContainer.start();
+//        return subscription;
+//    }
+
+
+    //TODO: THIS IS A SIMPLE METHOD TO GET A LIST OF SUBSCRIPTION, NEED TO CLEAN UP THE HARDCODED SECTION
+    // OF ADDING NEW SUBSCRIPTIONS
     @Bean
-    public Subscription subscription() throws UnknownHostException {
+    public List<Subscription> subscription() throws UnknownHostException {
         var options = StreamMessageListenerContainer.
                 StreamMessageListenerContainerOptions.
                 builder().
@@ -81,14 +109,45 @@ public class ConsumerConfig {
         var listenerContainer = StreamMessageListenerContainer.create(lettuceConnectionFactory(),options);
 
         //consume message
-        var subscription = listenerContainer.
-                receiveAutoAck(Consumer.from(String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A),InetAddress.getLocalHost().getHostName()),
-                StreamOffset.create(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
-                streamListener);
-        listenerContainer.start();
-        return subscription;
+        var subA = listenerContainer.
+                receiveAutoAck(Consumer.from(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_A),InetAddress.getLocalHost().getHostName()),
+                        StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
+                        streamListener);
 
+        var subB = listenerContainer.
+                receiveAutoAck(Consumer.from(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_B),InetAddress.getLocalHost().getHostName()),
+                        StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
+                        streamListener);
+
+        var subC = listenerContainer.
+                receiveAutoAck(Consumer.from(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_C),InetAddress.getLocalHost().getHostName()),
+                        StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
+                        streamListener);
+
+        List<Subscription> subscriptionList = new ArrayList<Subscription>();
+        subscriptionList.add(subA);
+        subscriptionList.add(subB);
+        subscriptionList.add(subC);
+
+        listenerContainer.start();
+        return subscriptionList;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){
