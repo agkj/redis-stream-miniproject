@@ -1,7 +1,7 @@
 package com.example.producer.Controllers;
 
 import com.example.producer.Model.GateModel;
-import com.example.producer.Services.Producer;
+import com.example.producer.Services.ProducerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProducerController {
 
     @Autowired
-    private final Producer producer;
+    private final ProducerService producer;
 
 
     @PostMapping(value = "/userpub" )
