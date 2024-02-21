@@ -1,25 +1,23 @@
 package com.example.producer.Services;
 
+import com.example.producer.Enums.GateGroupKeys;
+import com.example.producer.Enums.GateStreamKeys;
 import com.example.producer.Model.GateModel;
-import com.example.producer.SharedKeysEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor //reduce boilerplate code, no need to declare constructors/methods for implementation
 @Slf4j
-public class Producer {
+public class ProducerService {
 
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -28,16 +26,16 @@ public class Producer {
     public void userPublisher(String message){
         //create consumer group
         try {                                             //key, group
-            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), String.valueOf(SharedKeysEnum.USER_GROUP_KEY));
+            this.redisTemplate.opsForStream().createGroup(String.valueOf(GateStreamKeys.USER_STREAM_KEY), String.valueOf(GateStreamKeys.USER_GROUP_KEY));
         }catch (RedisSystemException e){
 
 
             if(e.getCause() != null){
-                log.info("group exists already! skipping group creation with id: " + SharedKeysEnum.USER_STREAM_KEY);
+                log.info("group exists already! skipping group creation with id: " + GateStreamKeys.USER_STREAM_KEY);
             }else throw e;
         }
 
-        ObjectRecord<String ,String > record = StreamRecords.newRecord().ofObject(message).withStreamKey(String.valueOf(SharedKeysEnum.USER_STREAM_KEY));
+        ObjectRecord<String ,String > record = StreamRecords.newRecord().ofObject(message).withStreamKey(String.valueOf(GateStreamKeys.USER_STREAM_KEY));
         this.redisTemplate.opsForStream().add(record);
 
         
@@ -47,8 +45,26 @@ public class Producer {
     //Adds a new stream entry to the stream
     public void gatePublisher(GateModel gateModel){
         //create consumer group
-        try {                                             //key, group
-            this.redisTemplate.opsForStream().createGroup(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), String.valueOf(SharedKeysEnum.GATE_GROUP_KEY_A));
+        try {
+
+            switch (gateModel.getGateGroup()){
+
+                case "A":
+                    this.redisTemplate.opsForStream().createGroup(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), String.valueOf(GateGroupKeys.GATE_GROUP_KEY_A));
+                    break;
+                case "B":
+                    this.redisTemplate.opsForStream().createGroup(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), String.valueOf(GateGroupKeys.GATE_GROUP_KEY_B));
+                    break;
+                case "C":
+                    this.redisTemplate.opsForStream().createGroup(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), String.valueOf(GateGroupKeys.GATE_GROUP_KEY_C));
+                case "MAIN":
+                    this.redisTemplate.opsForStream().createGroup(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), String.valueOf(GateGroupKeys.GATE_GROUP_KEY_MAIN));
+                    break;
+                default:
+                    break;
+
+            }
+
         }catch (RedisSystemException e){
 
 
@@ -57,7 +73,7 @@ public class Producer {
             }else throw e;
         }
 
-        ObjectRecord<String , GateModel> record = StreamRecords.newRecord().ofObject(gateModel).withStreamKey(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+        ObjectRecord<String , GateModel> record = StreamRecords.newRecord().ofObject(gateModel).withStreamKey(String.valueOf(GateStreamKeys.GATE_STREAM_KEY));
 
         this.redisTemplate.opsForStream().add(record);
 
@@ -73,7 +89,7 @@ public class Producer {
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
         //get stream size
-        Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY));
+        Long streamsize = streamOperations.size(String.valueOf(GateStreamKeys.GATE_STREAM_KEY));
         //get current time
         Long currentTime = System.currentTimeMillis();
 
@@ -90,9 +106,9 @@ public class Producer {
             for (int i =0;i<streamsize;i++){
 
 
-                String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
-                Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
-                RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
+                String streamMessage = streamOperations.range(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
+                Long streamEntryTime = streamOperations.range(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
+                RecordId recordId = streamOperations.range(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
 
                 //if gate hold checkbox is checked, prevent deletion
 
@@ -106,8 +122,8 @@ public class Producer {
 
                 //delete entries
                 if(currentTime - streamEntryTime >20000){
-                    //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
-                    streamOperations.delete(String.valueOf(SharedKeysEnum.GATE_STREAM_KEY),recordId);
+                    //streamOperations.trim(String.valueOf(GateStreamKeys.STREAM_KEY), minId);
+                    streamOperations.delete(String.valueOf(GateStreamKeys.GATE_STREAM_KEY),recordId);
 
                     System.out.println("Message: " + streamMessage + " has been deleted");
                     break;
@@ -115,7 +131,7 @@ public class Producer {
 
             }
 
-            //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
+            //streamOperations.trim(String.valueOf(GateStreamKeys.STREAM_KEY), minId);
 
         }
     }
@@ -128,7 +144,7 @@ public class Producer {
         StreamOperations<String, Object,Object> streamOperations = this.redisTemplate.opsForStream();
 
         //get stream size
-        Long streamsize = streamOperations.size(String.valueOf(SharedKeysEnum.USER_STREAM_KEY));
+        Long streamsize = streamOperations.size(String.valueOf(GateStreamKeys.USER_STREAM_KEY));
         Long currentTime = System.currentTimeMillis();
 
         // Delete the stream entries using XTRIM, must have at least 1 entries before delete can be executed
@@ -143,21 +159,21 @@ public class Producer {
             //retrieve records
             for (int i =0;i<streamsize;i++){
 
-                String streamMessage = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
-                Long streamEntryTime = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
-                RecordId recordId = streamOperations.range(String.valueOf(SharedKeysEnum.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
+                String streamMessage = streamOperations.range(String.valueOf(GateStreamKeys.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getValue();
+                Long streamEntryTime = streamOperations.range(String.valueOf(GateStreamKeys.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId().getTimestamp();
+                RecordId recordId = streamOperations.range(String.valueOf(GateStreamKeys.USER_STREAM_KEY), Range.closed(bot,top)).get(i).getId();
 
                 //delete entries that have lasted for more than 20 sec
                 if(currentTime - streamEntryTime >20000 ){
-                    //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
-                    streamOperations.delete(String.valueOf(SharedKeysEnum.USER_STREAM_KEY),recordId);
+                    //streamOperations.trim(String.valueOf(GateStreamKeys.STREAM_KEY), minId);
+                    streamOperations.delete(String.valueOf(GateStreamKeys.USER_STREAM_KEY),recordId);
                     System.out.println("Message: " + streamMessage + " has been deleted");
                     break;
                 }
 
             }
 
-            //streamOperations.trim(String.valueOf(SharedKeysEnum.STREAM_KEY), minId);
+            //streamOperations.trim(String.valueOf(GateStreamKeys.STREAM_KEY), minId);
 
         }
 
