@@ -1,15 +1,14 @@
 package com.example.producer.Model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 
 @NoArgsConstructor
-@Slf4j
-@Data
-
+@Getter
+@Setter
+@ToString
 public class GateModel {
 
     private int gateNumber; //gets gate number
