@@ -11,10 +11,12 @@ import lombok.ToString;
 @ToString
 public class LoginDTO {
 
-    private String username;
-    private String password;
-    private String accessLevel;
-    private String consumerGroup;
+    //this is only called when users are going to log in
+    private String username; //gets consumer username
+    private String password; //gets consumer password
+    private String accessLevel; //gets consumer access level
+    private String consumerGroup; //gets consumer group
+    private Boolean loginAccess; //gets logged in status
 
 
 }
