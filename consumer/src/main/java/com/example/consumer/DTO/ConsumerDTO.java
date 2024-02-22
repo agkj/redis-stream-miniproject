@@ -12,9 +12,10 @@ import lombok.ToString;
 @ToString
 public class ConsumerDTO {
 
-    private Integer id;
-    private String username;
-    private String password;
-    private String accessLevel;
-    private String consumerGroup;
+    private Integer id; //special id
+    private String username; //consumers username
+    private String password; //consumers password
+    private String accessLevel; //consumers access level
+    private String consumerGroup; //depending on access level, allocate the group that it can access
+    private Boolean loginAccess; //sets whether the user is currently logged in or not
 }
