@@ -123,11 +123,16 @@ public class ConsumerConfig {
                 receiveAutoAck(Consumer.from(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_C),InetAddress.getLocalHost().getHostName()),
                         StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
                         streamListener);
+        var subMain = listenerContainer.
+                receiveAutoAck(Consumer.from(String.valueOf(GateGroupKeys.GATE_GROUP_KEY_MAIN),InetAddress.getLocalHost().getHostName()),
+                        StreamOffset.create(String.valueOf(GateStreamKeys.GATE_STREAM_KEY), ReadOffset.lastConsumed()),
+                        streamListener);
 
         List<Subscription> subscriptionList = new ArrayList<Subscription>();
         subscriptionList.add(subA);
         subscriptionList.add(subB);
         subscriptionList.add(subC);
+        subscriptionList.add(subMain);
 
         listenerContainer.start();
         return subscriptionList;
