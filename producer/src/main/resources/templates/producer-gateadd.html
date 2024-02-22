@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <title>Gate Producer</title>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span> <span
+                    class="icon-bar"></span> <span class="icon-bar"></span> <span
+                    class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#" th:href="@{/producer/gateadd}">Gate Producer</a>
+        </div>
+    </div>
+</nav>
+<br>
+<br>
+<!-- Create HTML registration form -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <!-- success message -->
+            <div th:if="${param.success}">
+                <div class="alert alert-info">Gate posted</div>
+            </div>
+            <div th:if="${param.failure}">
+                <div class="alert alert-info">Failed to post gate</div>
+            </div>
+
+            <h1>Post a gate</h1>
+            <!-- th:object refers to model attribute in RegisterConsumerController-->
+            <form th:action="@{/producer/gateadd}" method="post" th:object="${gateModel}">
+
+                <div class="form-group">
+                    <label class="control-label" for="gateNumber"> Gate Number </label>
+                    <input id="gateNumber" class="form-control"
+                           th:field="*{gateNumber}" required autofocus="autofocus" />
+                    <!--th:field star(*) attribute binds "username" variable to consumerUser object and ConsumerDTO defined variable called username-->
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="gateGroup"> Gate Group </label>
+                    <input id="gateGroup" class="form-control"
+                           th:field="*{gateGroup}" required autofocus="autofocus" />
+                    <!--th:field star(*) attribute binds "username" variable to consumerUser object and ConsumerDTO defined variable called username-->
+                </div>
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Post gate</button>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
