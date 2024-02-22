@@ -10,22 +10,22 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/producer")
-public class ProducerController {
+public class APIProducerController {
 
     @Autowired
-    private final ProducerService producer;
+    private final ProducerService producerService;
 
 
     @PostMapping(value = "/userpub" )
     public String streamPublisher(@RequestBody String message){
-        producer.userPublisher(message);
+        producerService.userPublisher(message);
         return "message published";
     }
 
     //TO TEST THIS SHIT
     @PostMapping(value = "/gatepub" )
     public String streamPublisher(@RequestBody GateModel gateModel){
-        producer.gatePublisher(gateModel);
+        producerService.gatePublisher(gateModel);
         return "gate-pub";
     }
 
@@ -35,7 +35,7 @@ public class ProducerController {
     //checks the stream for streams that existed for more than 10 sec
     @Scheduled(fixedDelay = 10000)
     public String deleteGates(){
-        producer.autoDeleteGates();
+        producerService.autoDeleteGates();
         return "deleting gate data";
     }
 
