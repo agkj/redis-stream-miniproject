@@ -30,11 +30,35 @@ public class APIConsumerController {
         //return "list of users";
     }
     //Retrieve entire stream of gates
+    //TODO: CHECK IF LOGIN ALREADY, IF LOGIN TRUE THEN DISPLAY THE GATES
     @GetMapping(path = "/retrieve-gates")
     public List<MapRecord<String ,Object,Object>> retrieveGates(){
+
         return consumerService.retrieveGates();
-        //return "list of users";
     }
+
+
+    //ADDS NEW CONSUMER USER
+    @PostMapping(path = "/adduser")
+    public String addNewConsumer (@RequestBody ConsumerDTO consumerDTO) {
+
+        Boolean newConsumer = consumerService.addNewConsumer(consumerDTO);
+
+        if(newConsumer){
+            return "user:"+consumerDTO.getUsername() + " has been added with access level: "+ consumerDTO.getAccessLevel();
+        }
+        return "Username exists, create a new username";
+
+    }
+    //LOGSIN CONSUMER, will set consumer loginAccess
+    @PostMapping(path = "/login")
+    public ResponseEntity<?> loginConsumer(@RequestBody LoginDTO loginDTO){
+
+        LoginConsumerResponse loginConsumerResponse = consumerService.loginConsumer(loginDTO);
+        return ResponseEntity.ok(loginConsumerResponse);
+    }
+
+
 
     //Takes the json data from retrieve-gates, and puts it into the template for retrieval from model controller
     // to convert to model view
@@ -49,23 +73,8 @@ public class APIConsumerController {
 //        return jsonData;
 //    }
 
-    @PostMapping(path = "/adduser")
-    public String addNewConsumer (@RequestBody ConsumerDTO consumerDTO) {
 
-        Boolean newConsumer = consumerService.addNewConsumer(consumerDTO);
 
-        if(newConsumer){
-            return "user:"+consumerDTO.getUsername() + " has been added with access level: "+ consumerDTO.getAccessLevel();
-        }
-        return "Username exists, create a new username";
 
-    }
-
-    @PostMapping(path = "/login")
-    public ResponseEntity<?> loginConsumer(@RequestBody LoginDTO loginDTO){
-
-        LoginConsumerResponse loginConsumerResponse = consumerService.loginConsumer(loginDTO);
-        return ResponseEntity.ok(loginConsumerResponse);
-    }
 
 }
